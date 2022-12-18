@@ -1,0 +1,15 @@
+<idea-plugin>
+    <id>ma.leet.ft_header</id>
+    <version>1.0</version>
+    <name>Ft_header</name>
+    <vendor email="yez-zain@student.1337.ma" url="https://1337.ma">1337 Coding School</vendor>
+    <description><![CDATA[
+    Simple plugin for adding 42 school header to C source and header files
+  ]]></description>
+    <idea-version since-build="222.*" until-build="223.*" />
+    <depends>com.intellij.modules.platform</depends>
+    <applicationListeners>
+        <listener class="ma.leet.ft_header.SaveHook"
+                  topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
+    </applicationListeners>
+</idea-plugin>
