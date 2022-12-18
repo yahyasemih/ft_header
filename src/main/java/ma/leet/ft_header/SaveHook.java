@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import static ma.leet.ft_header.ProcessFortyTwoHeaderAction.*;
 
 public class SaveHook implements AnActionListener {
+
     @Override
     public void afterActionPerformed(@NotNull AnAction action, @NotNull AnActionEvent event, @NotNull AnActionResult result) {
         AnActionListener.super.afterActionPerformed(action, event, result);

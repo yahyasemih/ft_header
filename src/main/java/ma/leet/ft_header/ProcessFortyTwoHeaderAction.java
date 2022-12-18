@@ -73,7 +73,8 @@ public class ProcessFortyTwoHeaderAction {
         String fileName = file.getName().length() <= 41 ? file.getName() : file.getName().substring(0, 41);
         String userName = getUserName();
         Path path = Paths.get(file.getPath());
-        BasicFileAttributes view = null;
+        BasicFileAttributes view;
+
         try {
             view = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
         } catch (IOException e) {
