@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "ma.leet"
-version = "1.0"
+version = "1.1"
 
 repositories {
     mavenCentral()
@@ -13,7 +13,7 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.2.1")
+    version.value("2022.2.1")
     type.set("CL") // Target IDE Platform
 
     plugins.set(listOf(/* Plugin Dependencies */))
@@ -27,8 +27,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("222.3345.126")
-        untilBuild.set("223.7571.171")
+        sinceBuild.value("222.3345.126")
+        untilBuild.value("223.7571.171")
     }
 
     signPlugin {
@@ -39,5 +39,9 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+    }
+
+    patchPluginXml {
+        changeNotes.set("* Improve fresh header generation<br>* Improve header detection by using REGEX<br>")
     }
 }
