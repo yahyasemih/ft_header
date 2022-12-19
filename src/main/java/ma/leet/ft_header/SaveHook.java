@@ -12,7 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
-import static ma.leet.ft_header.ProcessFortyTwoHeaderAction.*;
+import static ma.leet.ft_header.ProcessFortyTwoHeaderUtils.*;
 
 public class SaveHook implements AnActionListener {
 

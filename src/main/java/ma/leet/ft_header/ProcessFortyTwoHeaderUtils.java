@@ -12,8 +12,30 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 
-public class ProcessFortyTwoHeaderAction {
+public class ProcessFortyTwoHeaderUtils {
+
+    private static final String DATE_REGEX = "([0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})";
+
+    private static final String LOGIN_REGEX = "([\\w-.]{3,10})";
+
+    private static final String EMAIL_REGEX = "([\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4})";
+
+    private static final String[] HEADER_REGEX = {
+        "^/\\* \\*{74} \\*/$",
+        "^/\\* {76}\\*/$",
+        "^/\\* {56}:{3} {6}:{8} {3}\\*/$",
+        "^/\\* {3}([a-z_][a-z0-9_]{0,38}\\.([ch])) {10,48}:\\+: {6}:\\+: {4}:\\+: {3}\\*/$",
+        "^/\\* {52}\\+:\\+ \\+:\\+ {9}\\+:\\+ {5}\\*/$",
+        "^/\\* {3}By: " + LOGIN_REGEX + " <" + EMAIL_REGEX + "> {1,8}\\+#\\+ {2}\\+:\\+ {7}\\+#\\+ {8}\\*/$",
+        "^/\\* {48}\\+#\\+#\\+#\\+#\\+#\\+ {3}\\+#\\+ {11}\\*/$",
+        "^/\\* {3}Created: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,10}#\\+# {4}#\\+# {13}\\*/$",
+        "^/\\* {3}Updated: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,9}### {3}#{8}\\.fr {7}\\*/$",
+        "^/\\* {76}\\*/$",
+        "^/\\* \\*{74} \\*/$"
+    };
+
     private static String getUserName() {
         String userName;
         if (System.getenv("USER") != null) {
@@ -32,6 +54,10 @@ public class ProcessFortyTwoHeaderAction {
             while (reader.ready() && i < 11) {
                 String line = reader.readLine();
                 if (line.length() != 80 || !line.startsWith("/*") || !line.endsWith("*/")) {
+                    return false;
+                }
+                if (!Pattern.matches(HEADER_REGEX[i], line)) {
+                    System.out.println("Error in line " + (i + 1) + ": " + line);
                     return false;
                 }
                 ++i;
@@ -56,7 +82,7 @@ public class ProcessFortyTwoHeaderAction {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date modificationDate = new Date(view == null ? file.getTimeStamp() : view.lastModifiedTime().toMillis());
         String updated = f.format(modificationDate);
         builder.append("/*   Updated: ").append(updated).append(" by ").append(userName)
@@ -80,7 +106,7 @@ public class ProcessFortyTwoHeaderAction {
         } catch (IOException e) {
             return "";
         }
-        DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date creationDate = new Date(view == null ? file.getTimeStamp() : view.creationTime().toMillis());
         Date modificationDate = new Date(view == null ? file.getTimeStamp() : view.lastModifiedTime().toMillis());
         String created = f.format(creationDate);
