@@ -43,9 +43,38 @@ public class ProcessFortyTwoHeaderUtils {
         } else if (System.getenv("LOGNAME") != null) {
             userName = System.getenv("LOGNAME");
         } else {
-            userName = "no user!";
+            userName = "logname";
+        }
+        if (userName.length() > 9) {
+            userName = userName.substring(0, 9);
         }
         return userName;
+    }
+
+    private static String getEmail() {
+        String email;
+        if (System.getenv("MAIL") != null) {
+            email = System.getenv("MAIL");
+        } else if (System.getenv("EMAIL") != null) {
+            email = System.getenv("EMAIL");
+        } else {
+            email = getUserName() + "@student.1337.ma";
+        }
+        if (email.length() > 25) {
+            email = email.substring(0, 25);
+        }
+        return email;
+    }
+
+    private static String getFileName(VirtualFile file) {
+        String filename = file.getName();
+
+        if (filename.length() > 41) {
+            filename = filename.substring(0, 41);
+        } else {
+            filename += " ".repeat(41 - filename.length());
+        }
+        return filename;
     }
 
     static boolean hasHeader(VirtualFile file) {
@@ -73,8 +102,10 @@ public class ProcessFortyTwoHeaderUtils {
 
     static void updateHeader(Document document, VirtualFile file) {
         StringBuilder builder = new StringBuilder();
-        String userName;
-        userName = getUserName();
+        String userName = getUserName();
+        if (userName.length() < 9) {
+            userName += " ".repeat(9 - userName.length());
+        }
         Path path = Paths.get(file.getPath());
         BasicFileAttributes view;
         try {
@@ -86,7 +117,7 @@ public class ProcessFortyTwoHeaderUtils {
         Date modificationDate = new Date(view == null ? file.getTimeStamp() : view.lastModifiedTime().toMillis());
         String updated = f.format(modificationDate);
         builder.append("/*   Updated: ").append(updated).append(" by ").append(userName)
-                .append("         ###   ########.fr       */");
+                .append("        ###   ########.fr       */");
         String updatedLine = builder.toString();
         if (document.getTextLength() > 648 + 80 && updatedLine.startsWith("/*   Updated: ")
                 && updatedLine.endsWith("###   ########.fr       */")) {
@@ -96,8 +127,15 @@ public class ProcessFortyTwoHeaderUtils {
 
     private static String generateHeader(VirtualFile file) {
         StringBuilder builder = new StringBuilder();
-        String fileName = file.getName().length() <= 41 ? file.getName() : file.getName().substring(0, 41);
+        String fileName = getFileName(file);
         String userName = getUserName();
+        String owner = userName + " <" + getEmail() + ">";
+        if (userName.length() < 9) {
+            userName += " ".repeat(9 - userName.length());
+        }
+        if (owner.length() < 37) {
+            owner += " ".repeat(37 - owner.length());
+        }
         Path path = Paths.get(file.getPath());
         BasicFileAttributes view;
 
@@ -115,17 +153,14 @@ public class ProcessFortyTwoHeaderUtils {
         builder.append("/* ************************************************************************** */\n");
         builder.append("/*                                                                            */\n");
         builder.append("/*                                                        :::      ::::::::   */\n");
-        builder.append("/*   ").append(fileName)
-                .append("                                         ", 0, 41 - fileName.length())
-                .append("          :+:      :+:    :+:   */\n");
+        builder.append("/*   ").append(fileName).append("          :+:      :+:    :+:   */\n");
         builder.append("/*                                                    +:+ +:+         +:+     */\n");
-        builder.append("/*   By: ").append(userName).append(" <").append(userName)
-                .append("@student.1337.ma>        +#+  +:+       +#+        */\n");
+        builder.append("/*   By: ").append(owner).append("      +#+  +:+       +#+        */\n");
         builder.append("/*                                                +#+#+#+#+#+   +#+           */\n");
         builder.append("/*   Created: ").append(created).append(" by ").append(userName)
-                .append("          #+#    #+#             */\n");
+                .append("         #+#    #+#             */\n");
         builder.append("/*   Updated: ").append(updated).append(" by ").append(userName)
-                .append("         ###   ########.fr       */\n");
+                .append("        ###   ########.fr       */\n");
         builder.append("/*                                                                            */\n");
         builder.append("/* ************************************************************************** */\n");
         builder.append('\n');
