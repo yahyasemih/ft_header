@@ -10,17 +10,14 @@ repositories {
     mavenCentral()
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     version.value("2022.2.1")
-    type.set("CL") // Target IDE Platform
+    type.set("CL")
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+    plugins.set(listOf())
 }
 
 tasks {
-    // Set the JVM compatibility versions
     withType<JavaCompile> {
         sourceCompatibility = "17"
         targetCompatibility = "17"
@@ -39,9 +36,5 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
-    }
-
-    patchPluginXml {
-        changeNotes.set("* Improve fresh header generation<br>* Improve header detection by using REGEX<br>")
     }
 }

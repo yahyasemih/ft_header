@@ -1,9 +1,12 @@
 package ma.leet.ft_header;
 
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,34 +16,38 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class ProcessFortyTwoHeaderUtils {
 
     private static final String DATE_REGEX = "([0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})";
 
-    private static final String LOGIN_REGEX = "([\\w-.]{3,10})";
+    private static final String LOGIN_REGEX = "([a-z-]{3,9})";
 
-    private static final String EMAIL_REGEX = "([\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4})";
+    private static final String EMAIL_REGEX = "([\\w-.]+@([\\w-]+\\.)+[a-zA-Z]{2,4})";
 
     private static final String[] HEADER_REGEX = {
-        "^/\\* \\*{74} \\*/$",
-        "^/\\* {76}\\*/$",
-        "^/\\* {56}:{3} {6}:{8} {3}\\*/$",
-        "^/\\* {3}([a-z_][a-z0-9_]{0,38}\\.([ch])) {10,48}:\\+: {6}:\\+: {4}:\\+: {3}\\*/$",
-        "^/\\* {52}\\+:\\+ \\+:\\+ {9}\\+:\\+ {5}\\*/$",
-        "^/\\* {3}By: " + LOGIN_REGEX + " <" + EMAIL_REGEX + "> {1,8}\\+#\\+ {2}\\+:\\+ {7}\\+#\\+ {8}\\*/$",
-        "^/\\* {48}\\+#\\+#\\+#\\+#\\+#\\+ {3}\\+#\\+ {11}\\*/$",
-        "^/\\* {3}Created: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,10}#\\+# {4}#\\+# {13}\\*/$",
-        "^/\\* {3}Updated: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,9}### {3}#{8}\\.fr {7}\\*/$",
-        "^/\\* {76}\\*/$",
-        "^/\\* \\*{74} \\*/$"
+            "^/\\* \\*{74} \\*/$",
+            "^/\\* {76}\\*/$",
+            "^/\\* {56}:{3} {6}:{8} {3}\\*/$",
+            "^/\\* {3}([a-z_][a-z0-9_]{0,38}\\.([ch])) {10,48}:\\+: {6}:\\+: {4}:\\+: {3}\\*/$",
+            "^/\\* {52}\\+:\\+ \\+:\\+ {9}\\+:\\+ {5}\\*/$",
+            "^/\\* {3}By: " + LOGIN_REGEX + " <" + EMAIL_REGEX + "> {1,33}\\+#\\+ {2}\\+:\\+ {7}\\+#\\+ {8}\\*/$",
+            "^/\\* {48}\\+#\\+#\\+#\\+#\\+#\\+ {3}\\+#\\+ {11}\\*/$",
+            "^/\\* {3}Created: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,15}#\\+# {4}#\\+# {13}\\*/$",
+            "^/\\* {3}Updated: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,14}### {3}#{8}\\.fr {7}\\*/$",
+            "^/\\* {76}\\*/$",
+            "^/\\* \\*{74} \\*/$"
     };
 
     private static String getUserName() {
+        Settings settings = new Settings(PathManager.getOptionsPath());
         String userName;
-        if (System.getenv("USER") != null) {
+        if (settings.getLogin() != null && !settings.getLogin().isEmpty()) {
+            userName = settings.getLogin();
+        } else if (System.getenv("USER") != null && !System.getenv("USER").isEmpty()) {
             userName = System.getenv("USER");
-        } else if (System.getenv("LOGNAME") != null) {
+        } else if (System.getenv("LOGNAME") != null && !System.getenv("LOGNAME").isEmpty()) {
             userName = System.getenv("LOGNAME");
         } else {
             userName = "logname";
@@ -52,10 +59,13 @@ public class ProcessFortyTwoHeaderUtils {
     }
 
     private static String getEmail() {
+        Settings settings = new Settings(PathManager.getOptionsPath());
         String email;
-        if (System.getenv("MAIL") != null) {
+        if (settings.getEmail() != null && !settings.getEmail().isEmpty()) {
+            email = settings.getEmail();
+        } else if (System.getenv("MAIL") != null && !System.getenv("MAIL").isEmpty()) {
             email = System.getenv("MAIL");
-        } else if (System.getenv("EMAIL") != null) {
+        } else if (System.getenv("EMAIL") != null && !System.getenv("EMAIL").isEmpty()) {
             email = System.getenv("EMAIL");
         } else {
             email = getUserName() + "@student.1337.ma";
@@ -75,6 +85,20 @@ public class ProcessFortyTwoHeaderUtils {
             filename += " ".repeat(41 - filename.length());
         }
         return filename;
+    }
+
+    static String getFileNameRegex() {
+        Settings settings = new Settings(PathManager.getOptionsPath());
+
+        if (settings.getFileNameRegex() == null || settings.getFileNameRegex().isEmpty()) {
+            return "([a-z_][a-z0-9_]*\\.([ch]))";
+        }
+        try {
+            Pattern.compile(settings.getFileNameRegex());
+        } catch (PatternSyntaxException e) {
+            return "([a-z_][a-z0-9_]*\\.([ch]))";
+        }
+        return settings.getFileNameRegex();
     }
 
     static boolean hasHeader(VirtualFile file) {
