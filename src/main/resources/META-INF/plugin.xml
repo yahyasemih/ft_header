@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>ma.leet.ft_header</id>
-    <version>1.1</version>
+    <version>1.2</version>
     <name>Ft_header</name>
     <vendor email="yez-zain@student.1337.ma" url="https://1337.ma">yez-zain</vendor>
     <description><![CDATA[
@@ -8,11 +8,7 @@
     ]]></description>
     <change-notes><![CDATA[
     <ul>
-        <li>Improved fresh header generation.</li>
-        <li>Improved header detection by using REGEX.</li>
-        <li>Added ability to provide files to match via IDE settings.</li>
-        <li>Added ability to provide login and email via IDE settings instead of relying on
-            environment variables.</li>
+        <li>Make plugin compatible with CLion 2022.3.1.</li>
     </ul>
     ]]></change-notes>
     <idea-version since-build="222.*" until-build="223.*"/>
