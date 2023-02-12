@@ -24,7 +24,7 @@ public class ProcessFortyTwoHeaderUtils {
 
     private static final String LOGIN_REGEX = "([a-z-]{3,9})";
 
-    private static final String EMAIL_REGEX = "([\\w-.]+@([\\w-]+\\.)+[a-zA-Z]{2,4})";
+    private static final String EMAIL_REGEX = "([\\w-.]+@[a-zA-Z0-9-.]*)";
 
     private static final String[] HEADER_REGEX = {
             "^/\\* \\*{74} \\*/$",

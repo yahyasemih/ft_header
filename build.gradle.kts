@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "ma.leet"
-version = "1.3"
+version = "1.4"
 
 repositories {
     mavenCentral()
