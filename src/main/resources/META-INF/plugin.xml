@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>ma.leet.ft_header</id>
-    <version>1.4</version>
+    <version>1.5</version>
     <name>Ft_header</name>
     <vendor email="yez-zain@student.1337.ma" url="https://1337.ma">yez-zain</vendor>
     <description><![CDATA[
@@ -8,10 +8,10 @@
     ]]></description>
     <change-notes><![CDATA[
     <ul>
-        <li>Fix rejecting headers with truncated long email address.</li>
+        <li>Make plugin compatible with CLion 2023.1.1.</li>
     </ul>
     ]]></change-notes>
-    <idea-version since-build="222.*" until-build="223.*"/>
+    <idea-version since-build="222.*" until-build="231.*"/>
     <depends>com.intellij.modules.platform</depends>
     <applicationListeners>
         <listener class="ma.leet.ft_header.SaveHook"
