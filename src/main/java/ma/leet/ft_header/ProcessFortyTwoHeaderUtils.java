@@ -70,8 +70,8 @@ public class ProcessFortyTwoHeaderUtils {
         } else {
             email = getUserName() + "@student.1337.ma";
         }
-        if (email.length() > 25) {
-            email = email.substring(0, 25);
+        if (email.length() > 30) {
+            email = email.substring(0, 30);
         }
         return email;
     }
@@ -157,8 +157,8 @@ public class ProcessFortyTwoHeaderUtils {
         if (userName.length() < 9) {
             userName += " ".repeat(9 - userName.length());
         }
-        if (owner.length() < 37) {
-            owner += " ".repeat(37 - owner.length());
+        if (owner.length() < 42) {
+            owner += " ".repeat(42 - owner.length());
         }
         Path path = Paths.get(file.getPath());
         BasicFileAttributes view;
@@ -179,7 +179,7 @@ public class ProcessFortyTwoHeaderUtils {
         builder.append("/*                                                        :::      ::::::::   */\n");
         builder.append("/*   ").append(fileName).append("          :+:      :+:    :+:   */\n");
         builder.append("/*                                                    +:+ +:+         +:+     */\n");
-        builder.append("/*   By: ").append(owner).append("      +#+  +:+       +#+        */\n");
+        builder.append("/*   By: ").append(owner).append(" +#+  +:+       +#+        */\n");
         builder.append("/*                                                +#+#+#+#+#+   +#+           */\n");
         builder.append("/*   Created: ").append(created).append(" by ").append(userName)
                 .append("         #+#    #+#             */\n");

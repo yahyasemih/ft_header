@@ -9,6 +9,7 @@
     <change-notes><![CDATA[
     <ul>
         <li>Fix validation of 42 header when applied to files other than C files.</li>
+        <li>Avoid stripping long emails as much as possible.</li>
     </ul>
     ]]></change-notes>
     <idea-version since-build="222.*" until-build="231.*"/>
