@@ -15,6 +15,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -26,7 +27,7 @@ public class ProcessFortyTwoHeaderUtils {
 
     private static final String EMAIL_REGEX = "([\\w-.]+@[a-zA-Z0-9-.]*)";
 
-    private static final String[] HEADER_REGEX = {
+    private static final String[] C_LIKE_HEADER_REGEX = {
             "^/\\* \\*{74} \\*/$",
             "^/\\* {76}\\*/$",
             "^/\\* {56}:{3} {6}:{8} {3}\\*/$",
@@ -39,6 +40,30 @@ public class ProcessFortyTwoHeaderUtils {
             "^/\\* {76}\\*/$",
             "^/\\* \\*{74} \\*/$"
     };
+
+    private static final String[] MAKEFILE_HEADER_REGEX = {
+            "^# \\*{76} #$",
+            "^# {78}#$",
+            "^# {57}:{3} {6}:{8} {4}#$",
+            "^# {4}([a-zA-Z_][a-zA-Z0-9_.]{0,40}) {10,48}:\\+: {6}:\\+: {4}:\\+: {4}#$",
+            "^# {53}\\+:\\+ \\+:\\+ {9}\\+:\\+ {6}#$",
+            "^# {4}By: " + LOGIN_REGEX + " <" + EMAIL_REGEX + "> {1,33}\\+#\\+ {2}\\+:\\+ {7}\\+#\\+ {9}#$",
+            "^# {49}\\+#\\+#\\+#\\+#\\+#\\+ {3}\\+#\\+ {12}#$",
+            "^# {4}Created: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,15}#\\+# {4}#\\+# {14}#$",
+            "^# {4}Updated: " + DATE_REGEX + " by " + LOGIN_REGEX + " {1,14}### {3}#{8}\\.fr {8}#$",
+            "^# {78}#$",
+            "^# \\*{76} #$"
+    };
+
+    static final Set<String> SUPPORTED_TYPES = Set.of("c", "cpp", "h", "hpp", "makefile", "java");
+
+    static String getFileExtension(VirtualFile file) {
+        if (file.getExtension() != null) {
+            return file.getExtension().toLowerCase();
+        } else {
+            return file.getName().toLowerCase();
+        }
+    }
 
     private static String getUserName() {
         Settings settings = new Settings(PathManager.getOptionsPath());
@@ -102,14 +127,19 @@ public class ProcessFortyTwoHeaderUtils {
     }
 
     static boolean hasHeader(VirtualFile file) {
+        String type = getFileExtension(file);
+        if (!SUPPORTED_TYPES.contains(type)) {
+            return false;
+        }
+        final String[] headerRegex = type.equals("makefile") ? MAKEFILE_HEADER_REGEX : C_LIKE_HEADER_REGEX;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             int i = 0;
             while (reader.ready() && i < 11) {
                 String line = reader.readLine();
-                if (line.length() != 80 || !line.startsWith("/*") || !line.endsWith("*/")) {
+                if (line.length() != 80) {
                     return false;
                 }
-                if (!Pattern.matches(HEADER_REGEX[i], line)) {
+                if (!Pattern.matches(headerRegex[i], line)) {
                     System.out.println("Error in line " + (i + 1) + ": " + line);
                     return false;
                 }
@@ -125,7 +155,10 @@ public class ProcessFortyTwoHeaderUtils {
     }
 
     static void updateHeader(Document document, VirtualFile file) {
-        StringBuilder builder = new StringBuilder();
+        String type = getFileExtension(file);
+        if (!SUPPORTED_TYPES.contains(type)) {
+            return;
+        }
         String userName = getUserName();
         if (userName.length() < 9) {
             userName += " ".repeat(9 - userName.length());
@@ -140,17 +173,22 @@ public class ProcessFortyTwoHeaderUtils {
         DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date modificationDate = new Date(view == null ? file.getTimeStamp() : view.lastModifiedTime().toMillis());
         String updated = f.format(modificationDate);
-        builder.append("/*   Updated: ").append(updated).append(" by ").append(userName)
-                .append("        ###   ########.fr       */");
-        String updatedLine = builder.toString();
-        if (document.getTextLength() > 648 + 80 && updatedLine.startsWith("/*   Updated: ")
-                && updatedLine.endsWith("###   ########.fr       */")) {
+        String updatedLine;
+        if (type.equals("makefile")) {
+            updatedLine = "#    Updated: " + updated + " by " + userName + "        ###   ########.fr        #";
+        } else {
+            updatedLine = "/*   Updated: " + updated + " by " + userName + "        ###   ########.fr       */";
+        }
+        if (document.getTextLength() > 648 + 80) {
             document.replaceString(648, 648 + 80, updatedLine);
         }
     }
 
     private static String generateHeader(VirtualFile file) {
-        StringBuilder builder = new StringBuilder();
+        String type = getFileExtension(file);
+        if (!SUPPORTED_TYPES.contains(type)) {
+            return "";
+        }
         String fileName = getFileName(file);
         String userName = getUserName();
         String owner = userName + " <" + getEmail() + ">";
@@ -174,21 +212,41 @@ public class ProcessFortyTwoHeaderUtils {
         String created = f.format(creationDate);
         String updated = f.format(modificationDate);
 
-        builder.append("/* ************************************************************************** */\n");
-        builder.append("/*                                                                            */\n");
-        builder.append("/*                                                        :::      ::::::::   */\n");
-        builder.append("/*   ").append(fileName).append("          :+:      :+:    :+:   */\n");
-        builder.append("/*                                                    +:+ +:+         +:+     */\n");
-        builder.append("/*   By: ").append(owner).append(" +#+  +:+       +#+        */\n");
-        builder.append("/*                                                +#+#+#+#+#+   +#+           */\n");
-        builder.append("/*   Created: ").append(created).append(" by ").append(userName)
-                .append("         #+#    #+#             */\n");
-        builder.append("/*   Updated: ").append(updated).append(" by ").append(userName)
-                .append("        ###   ########.fr       */\n");
-        builder.append("/*                                                                            */\n");
-        builder.append("/* ************************************************************************** */\n");
-        builder.append('\n');
-        return builder.toString();
+        if (type.equals("makefile")) {
+            return generateMakefileHeader(fileName, userName, owner, created, updated);
+        } else {
+            return generateCLikeHeader(fileName, userName, owner, created, updated);
+        }
+    }
+
+    private static String generateCLikeHeader(String fileName, String userName, String owner, String created,
+                                              String updated) {
+        return "/* ************************************************************************** */\n" +
+                "/*                                                                            */\n" +
+                "/*                                                        :::      ::::::::   */\n" +
+                "/*   " + fileName + "          :+:      :+:    :+:   */\n" +
+                "/*                                                    +:+ +:+         +:+     */\n" +
+                "/*   By: " + owner + " +#+  +:+       +#+        */\n" +
+                "/*                                                +#+#+#+#+#+   +#+           */\n" +
+                "/*   Created: " + created + " by " + userName + "         #+#    #+#             */\n" +
+                "/*   Updated: " + updated + " by " + userName + "        ###   ########.fr       */\n" +
+                "/*                                                                            */\n" +
+                "/* ************************************************************************** */\n\n";
+    }
+
+    private static String generateMakefileHeader(String fileName, String userName, String owner, String created,
+                                                 String updated) {
+        return "# **************************************************************************** #\n" +
+                "#                                                                              #\n" +
+                "#                                                         :::      ::::::::    #\n" +
+                "#    " + fileName + "          :+:      :+:    :+:    #\n" +
+                "#                                                     +:+ +:+         +:+      #\n" +
+                "#    By: " + owner + " +#+  +:+       +#+         #\n" +
+                "#                                                 +#+#+#+#+#+   +#+            #\n" +
+                "#    Created: " + created + " by " + userName + "         #+#    #+#              #\n" +
+                "#    Updated: " + updated + " by " + userName + "        ###   ########.fr        #\n" +
+                "#                                                                              #\n" +
+                "# **************************************************************************** #\n\n";
     }
 
     static void putHeader(Document document, VirtualFile file) {

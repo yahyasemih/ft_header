@@ -1,6 +1,9 @@
 package ma.leet.ft_header;
 
 import com.intellij.ide.actions.SaveAllAction;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.AnActionResult;
@@ -34,6 +37,15 @@ public class SaveHook implements AnActionListener {
                 return;
             }
             Document document = editor.getDocument();
+            String type = getFileExtension(file);
+            if (!SUPPORTED_TYPES.contains(type)) {
+                String content = "No header support for language " + type;
+                Notification notification = NotificationGroupManager.getInstance()
+                        .getNotificationGroup("Unsupported File Headers")
+                        .createNotification(content, NotificationType.ERROR);
+                notification.notify(project);
+                return;
+            }
             Runnable runnable = () -> {
                 if (hasHeader(file)) {
                     System.out.println("Updating header in file: " + file);
