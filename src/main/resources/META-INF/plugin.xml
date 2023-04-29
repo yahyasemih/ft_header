@@ -1,15 +1,14 @@
 <idea-plugin>
     <id>ma.leet.ft_header</id>
-    <version>1.6</version>
+    <version>1.7</version>
     <name>Ft_header</name>
-    <vendor email="yez-zain@student.1337.ma" url="https://1337.ma">yez-zain</vendor>
+    <vendor email="yez-zain@student.1337.ma" url="https://cv.42.fr/yez-zain">yez-zain</vendor>
     <description><![CDATA[
     Simple plugin for adding 42 school header to C source and header files.
     ]]></description>
     <change-notes><![CDATA[
     <ul>
-        <li>Fix validation of 42 header when applied to files other than C files.</li>
-        <li>Avoid stripping long emails as much as possible.</li>
+        <li>Add support for Makefile header.</li>
     </ul>
     ]]></change-notes>
     <idea-version since-build="222.*" until-build="231.*"/>
@@ -26,5 +25,8 @@
                 instance="ma.leet.ft_header.AppSettingsConfigurable"
                 id="ma.leet.ft_header.AppSettingsConfigurable"
                 displayName="42 Header Settings"/>
+        <notificationGroup
+                id="Unsupported File Headers"
+                displayType="BALLOON"/>
     </extensions>
 </idea-plugin>
