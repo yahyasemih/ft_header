@@ -1,6 +1,7 @@
 package ma.leet.ft_header;
 
 import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.vfs.VirtualFile;
 
@@ -21,6 +22,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class ProcessFortyTwoHeaderUtils {
 
+    private static final Logger Log = Logger.getInstance("ProcessFortyTwoHeaderUtils");
     private static final String DATE_REGEX = "([0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})";
 
     private static final String LOGIN_REGEX = "([a-z-]{3,9})";
@@ -129,6 +131,7 @@ public class ProcessFortyTwoHeaderUtils {
     static boolean hasHeader(VirtualFile file) {
         String type = getFileExtension(file);
         if (!SUPPORTED_TYPES.contains(type)) {
+            Log.info(type + " not supported");
             return false;
         }
         final String[] headerRegex = type.equals("makefile") ? MAKEFILE_HEADER_REGEX : C_LIKE_HEADER_REGEX;
@@ -137,10 +140,11 @@ public class ProcessFortyTwoHeaderUtils {
             while (reader.ready() && i < 11) {
                 String line = reader.readLine();
                 if (line.length() != 80) {
+                    Log.info("Line " + (i + 1) + " longer than 80 character");
                     return false;
                 }
                 if (!Pattern.matches(headerRegex[i], line)) {
-                    System.out.println("Error in line " + (i + 1) + ": " + line);
+                    Log.info("Error in line " + (i + 1) + ": " + line);
                     return false;
                 }
                 ++i;
@@ -149,6 +153,7 @@ public class ProcessFortyTwoHeaderUtils {
                 return false;
             }
         } catch (IOException e) {
+            Log.info("Exception while reading header: " + e.getMessage());
             return false;
         }
         return true;
@@ -157,6 +162,7 @@ public class ProcessFortyTwoHeaderUtils {
     static void updateHeader(Document document, VirtualFile file) {
         String type = getFileExtension(file);
         if (!SUPPORTED_TYPES.contains(type)) {
+            Log.info(type + " not supported");
             return;
         }
         String userName = getUserName();
@@ -168,6 +174,7 @@ public class ProcessFortyTwoHeaderUtils {
         try {
             view = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
         } catch (IOException e) {
+            Log.info("Exception while reading header: " + e.getMessage());
             throw new RuntimeException(e);
         }
         DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -187,6 +194,7 @@ public class ProcessFortyTwoHeaderUtils {
     private static String generateHeader(VirtualFile file) {
         String type = getFileExtension(file);
         if (!SUPPORTED_TYPES.contains(type)) {
+            Log.info(type + " not supported");
             return "";
         }
         String fileName = getFileName(file);
@@ -204,6 +212,7 @@ public class ProcessFortyTwoHeaderUtils {
         try {
             view = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
         } catch (IOException e) {
+            Log.info("Exception while reading header: " + e.getMessage());
             return "";
         }
         DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
