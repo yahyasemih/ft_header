@@ -12,7 +12,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class AppSettingsComponent {
 
-    private static final String LOGIN_REGEX = "^([a-z-]{3,9})?$";
+    private static final String LOGIN_REGEX = "^([a-zA-Z0-9-]{3,9})?$";
 
     private static final String EMAIL_REGEX = "^([\\w-.]+@([\\w-]+\\.)+[a-zA-Z]{2,4})?$";
 
