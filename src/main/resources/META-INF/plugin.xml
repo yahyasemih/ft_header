@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>ma.leet.ft_header</id>
-    <version>1.9</version>
+    <version>1.10</version>
     <name>Ft_header</name>
     <vendor email="yezzainabi@gmail.com" url="https://cv.42.fr/yez-zain">Yahya EZ-ZAINABI</vendor>
     <description><![CDATA[
@@ -8,11 +8,10 @@
     ]]></description>
     <change-notes><![CDATA[
     <ul>
-        <li>Make plugin compatible with CLion 2023.3.</li>
-        <li>Accept logins containing numbers and uppercase letters.</li>
+        <li>Make plugin compatible with CLion 2024.1.</li>
     </ul>
     ]]></change-notes>
-    <idea-version since-build="222.*" until-build="233.*"/>
+    <idea-version since-build="222.*" until-build="241.*"/>
     <depends>com.intellij.modules.platform</depends>
     <applicationListeners>
         <listener class="ma.leet.ft_header.SaveHook"
