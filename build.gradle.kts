@@ -11,7 +11,7 @@ repositories {
 }
 
 intellij {
-    version.value("2023.3")
+    version.value("LATEST-EAP-SNAPSHOT")
     type.set("CL")
 
     plugins.set(listOf())
