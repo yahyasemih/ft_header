@@ -1,20 +1,22 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("org.jetbrains.intellij.platform") version "2.7.2"
 }
 
 group = "ma.leet"
-version = "1.14"
+version = "1.15"
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-intellij {
-    version.value("LATEST-EAP-SNAPSHOT")
-    type.set("CL")
-
-    plugins.set(listOf())
+dependencies {
+    intellijPlatform {
+        create("CL", "2025.2")
+    }
 }
 
 tasks {
@@ -24,7 +26,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.value("222")
+        sinceBuild.value("252")
         untilBuild.set(provider { null })
     }
 
